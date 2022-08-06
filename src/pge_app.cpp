@@ -6,6 +6,7 @@ namespace pge {
         while (!pgeWindow.shouldClose())
         {
             glfwPollEvents();
+            pgeWindow.updateRenderer();
         }
         
     }
