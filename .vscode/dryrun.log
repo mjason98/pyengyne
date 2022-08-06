@@ -1,6 +1,0 @@
-make --dry-run --always-make --keep-going --print-directory
-make: Entering directory '/DATA/work_space/PietyDev/myEngyne'
-make: Leaving directory '/DATA/work_space/PietyDev/myEngyne'
- 
-make: *** No targets specified and no makefile found.  Stop.
-

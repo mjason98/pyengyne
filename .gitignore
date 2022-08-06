@@ -1,3 +1,5 @@
 bgfx/*
 bx/*
 bimg/*
+.vscode
+bin
