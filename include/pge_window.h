@@ -6,9 +6,13 @@
 #define BX_CONFIG_DEBUG 0
 #endif
 
+
+
 #include <bx/bx.h>
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
+
+#define GLFW_INCLUDE_VULKAN
 
 #include <GLFW/glfw3.h>
 

@@ -63,19 +63,15 @@ namespace pge
         init.platformData.nwh = glfwGetWin32Window(window);
 #endif
 
-        init.type = bgfx::RendererType::OpenGL;
+        init.type = bgfx::RendererType::OpenGL; // todo: put flags for vulkan
         init.resolution.width = (uint32_t)width;
         init.resolution.height = (uint32_t)height;
         init.resolution.reset = BGFX_RESET_VSYNC;
         bgfx::init(init);
 
-        std::cout << "here\n";
-
         // Set view 0 to the same dimensions as the window and to clear the color buffer.
         bgfx::setViewClear(kClearView, BGFX_CLEAR_COLOR);
         bgfx::setViewRect(kClearView, 0, 0, bgfx::BackbufferRatio::Equal);
-
-        std::cout << "here\n";
     }
 
     void PgeWindow::updateRenderer()
