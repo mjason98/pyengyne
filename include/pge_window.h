@@ -1,8 +1,3 @@
-/*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
- */
-
 #pragma once
 
 #ifdef DEBUG
@@ -15,6 +10,8 @@
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
 
+#include <GLFW/glfw3.h>
+
 #if BX_PLATFORM_LINUX
 #define GLFW_EXPOSE_NATIVE_X11
 #elif BX_PLATFORM_WINDOWS
@@ -23,7 +20,6 @@
 #define GLFW_EXPOSE_NATIVE_COCOA
 #endif
 
-#include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 #include <string>
 #include <iostream>

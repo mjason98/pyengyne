@@ -7,11 +7,13 @@ INCLUDE_FOLDER=include
 # -----------------------------------  LIBRARIES -----------------------------------
 
 INCLUDE_FLAGS=-I$(INCLUDE_FOLDER)
-RENDER_FLAGS=-lglfw -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi -lGL -lvulkan
+RENDER_FLAGS=-ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi -lGL -lvulkan
 
 binmake := $(shell if ! [[ -d ${BIN_FOLDER} ]]; then mkdir ${BIN_FOLDER}; fi)
 
-# LIBRARIES : BGFX ------------------------------------------------------------------
+# LIBRARIES : ------------------------------------------------------------------
+INCLUDE_FLAGS+= -Iglfw/include
+RENDER_FLAGS+= glfw/build/src/libglfw3.a
 
 INCLUDE_FLAGS+= -Ibgfx/include -Ibx/include -Ibimg/include
 RENDER_FLAGS+= bgfx/.build/linux64_gcc/bin/libbgfx-shared-libRelease.so

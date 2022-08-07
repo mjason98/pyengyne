@@ -63,7 +63,7 @@ namespace pge
         init.platformData.nwh = glfwGetWin32Window(window);
 #endif
 
-        init.type = bgfx::RendererType::Count;
+        init.type = bgfx::RendererType::OpenGL;
         init.resolution.width = (uint32_t)width;
         init.resolution.height = (uint32_t)height;
         init.resolution.reset = BGFX_RESET_VSYNC;

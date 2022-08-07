@@ -3,3 +3,4 @@ bx/*
 bimg/*
 .vscode
 bin
+glfw/*
