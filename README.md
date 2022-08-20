@@ -5,7 +5,7 @@ This engyne, is intended to repleace old engyne based on opengl
 ## Build, Run and Release compilation
 First clone the repository
 ```shell
-git clone --recursive [this url]
+git clone --recursive https://github.com/mjason98/pyengyne.git
 ```
 ### Build bgfx
 For more build options rather than Linux, check this.

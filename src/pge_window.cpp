@@ -1,6 +1,7 @@
 #include "pge_window.h"
 
 #include <stdexcept>
+#include <fstream>
 
 namespace pge
 {
@@ -33,6 +34,29 @@ namespace pge
             s_showStats = !s_showStats;
 #endif
     }
+
+    bgfx::ShaderHandle loadShader(const char *_name)
+    {
+        char *data = new char[2048]; // see charsize
+        std::ifstream file;
+        size_t fileSize;
+        file.open(_name);
+        if (file.is_open())
+        {
+            file.seekg(0, std::ios::end);
+            fileSize = file.tellg();
+            file.seekg(0, std::ios::beg);
+            file.read(data, fileSize);
+            file.close();
+        }
+        const bgfx::Memory *mem = bgfx::copy(data, fileSize + 1);
+        mem->data[mem->size - 1] = '\0';
+        bgfx::ShaderHandle handle = bgfx::createShader(mem);
+        bgfx::setName(handle, _name);
+        return handle;
+    }
+
+    bgfx::VertexLayout PosColorVertex::ms_layout;
 
     void PgeWindow::initWindow()
     {
@@ -70,9 +94,39 @@ namespace pge
         bgfx::init(init);
 
         // Set view 0 to the same dimensions as the window and to clear the color buffer.
-        bgfx::setViewClear(kClearView, BGFX_CLEAR_COLOR);
-        bgfx::setViewRect(kClearView, 0, 0, bgfx::BackbufferRatio::Equal);
+        bgfx::setViewClear(0
+			, BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
+			, 0x303030ff
+			, 1.0f
+			, 0
+			);
+
+
+        // bgfx::setViewRect(0, 0, 0, bgfx::BackbufferRatio::Equal);
+
+        // -------------------------
+
+        PosColorVertex::init();
+
+        m_vbh = bgfx::createVertexBuffer(
+            // Static data can be passed with bgfx::makeRef
+            bgfx::makeRef(s_cubeVertices, sizeof(s_cubeVertices)),
+            PosColorVertex::ms_layout);
+
+        m_ibh = bgfx::createIndexBuffer(
+            // Static data can be passed with bgfx::makeRef
+            bgfx::makeRef(s_cubeTriList, sizeof(s_cubeTriList)));
+
+
+        vsh = loadShader("bin/shaders/vs_simple.bin");
+        fsh = loadShader("bin/shaders/fs_simple.bin");
+
+        m_program = bgfx::createProgram(vsh, fsh, true);
     }
+
+    // ------------------------------------------------------------------
+
+    // ------------------------------------------------------------------
 
     void PgeWindow::updateRenderer()
     {
@@ -85,18 +139,53 @@ namespace pge
             bgfx::setViewRect(kClearView, 0, 0, bgfx::BackbufferRatio::Equal);
         }
         // This dummy draw call is here to make sure that view 0 is cleared if no other draw calls are submitted to view 0.
-        bgfx::touch(kClearView);
-        // Use debug font to print information about this example.
-        bgfx::dbgTextClear();
-        bgfx::dbgTextPrintf(0, 0, 0x0f, "Press F1 to toggle stats.");
-        bgfx::dbgTextPrintf(0, 1, 0x0f, "Color can be changed with ANSI \x1b[9;me\x1b[10;ms\x1b[11;mc\x1b[12;ma\x1b[13;mp\x1b[14;me\x1b[0m code too.");
-        bgfx::dbgTextPrintf(80, 1, 0x0f, "\x1b[;0m    \x1b[;1m    \x1b[; 2m    \x1b[; 3m    \x1b[; 4m    \x1b[; 5m    \x1b[; 6m    \x1b[; 7m    \x1b[0m");
-        bgfx::dbgTextPrintf(80, 2, 0x0f, "\x1b[;8m    \x1b[;9m    \x1b[;10m    \x1b[;11m    \x1b[;12m    \x1b[;13m    \x1b[;14m    \x1b[;15m    \x1b[0m");
-        const bgfx::Stats *stats = bgfx::getStats();
-        bgfx::dbgTextPrintf(0, 2, 0x0f, "Backbuffer %dW x %dH in pixels, debug text %dW x %dH in characters.", stats->width, stats->height, stats->textWidth, stats->textHeight);
+        // bgfx::touch(kClearView);
+
+#ifdef DEBUG
         // Enable stats or debug text.
         bgfx::setDebug(s_showStats ? BGFX_DEBUG_STATS : BGFX_DEBUG_TEXT);
+#endif
         // Advance to next frame. Process submitted rendering primitives.
+        // bgfx::frame();
+
+        const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
+        const bx::Vec3 eye = {0.0f, 0.0f, 10.0f};
+
+        // Set view and projection matrix for view 0.
+        float view[16];
+        bx::mtxLookAt(view, eye, at);
+
+        float proj[16];
+        bx::mtxProj(proj, 60.0f, float(width) / float(height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
+
+        bgfx::setViewTransform(0, view, proj);
+
+        // Set view 0 default viewport.
+        bgfx::setViewRect(0, 0, 0, width, height);
+
+        bgfx::touch(0);
+
+        float mtx[16];
+        bx::mtxRotateY(mtx, 0.0f);
+
+        // position x,y,z
+        mtx[12] = 0.0f;
+        mtx[13] = 0.0f;
+        mtx[14] = 0.0f;
+
+        // Set model matrix for rendering.
+        bgfx::setTransform(mtx);
+
+        // Set vertex and index buffer.
+        bgfx::setVertexBuffer(0, m_vbh);
+        bgfx::setIndexBuffer(m_ibh);
+
+        // Set render states.
+        bgfx::setState(BGFX_STATE_DEFAULT);
+
+        // Submit primitive for rendering to view 0.
+        bgfx::submit(0, m_program);
+
         bgfx::frame();
     }
 }

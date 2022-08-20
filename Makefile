@@ -3,6 +3,8 @@ BIN_FOLDER=bin
 BUILD_FOLDER=build
 SRC_FOLDER=src
 INCLUDE_FOLDER=include
+SHADERS_FOLDER=shaders
+BIN_SHADER_FOLDER=${BIN_FOLDER}/${SHADERS_FOLDER}
 
 # -----------------------------------  LIBRARIES -----------------------------------
 
@@ -10,6 +12,9 @@ INCLUDE_FLAGS=-I$(INCLUDE_FOLDER)
 RENDER_FLAGS=-ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi -lGL -lvulkan
 
 binmake := $(shell if ! [[ -d ${BIN_FOLDER} ]]; then mkdir ${BIN_FOLDER}; fi)
+binmake_s := $(shell if ! [[ -d ${BIN_SHADER_FOLDER} ]]; then mkdir ${BIN_SHADER_FOLDER}; fi)
+
+SHADERC=bgfx/.build/linux64_gcc/bin/shadercRelease
 
 # LIBRARIES : ------------------------------------------------------------------
 INCLUDE_FLAGS+= -Iglfw/include
@@ -28,6 +33,10 @@ SOURCES= $(wildcard $(SRC_FOLDER)/*.cpp)
 SOURCES+=$(wildcard $(SRC_FOLDER)/*.c)
 OBJS = $(addprefix  $(BIN_FOLDER)/,$(addsuffix .o, $(basename $(notdir $(SOURCES)))))
 # -----------------------------------------------------------------------------------
+SSOURCES= $(wildcard $(SHADERS_FOLDER)/*.vert)
+SSOURCES+=$(wildcard $(SHADERS_FOLDER)/*.frag)
+SOBJS = $(addprefix  $(BIN_SHADER_FOLDER)/,$(addsuffix .bin, $(basename $(notdir $(SSOURCES)))))
+# -----------------------------------------------------------------------------------
 
 .PHONY: all debug clean run newclass
 
@@ -37,6 +46,19 @@ debug: CXXFLAGS+=-g3 -ggdb
 debug: CXXFLAGS+=-DDEBUG
 debug: ${BIN_FOLDER}/main
 
+# shader compilation ********************************************************
+${BIN_SHADER_FOLDER}/%.bin:$(SHADERS_FOLDER)/%.vert
+	${binmake}
+	${binmake_s}
+	@echo $@
+	@$(SHADERC) -f $< -o $@ --platform linux --type vertex --verbose -i bgfx/src
+
+${BIN_SHADER_FOLDER}/%.bin:$(SHADERS_FOLDER)/%.frag
+	${binmake}
+	${binmake_s}
+	@echo $@
+	@$(SHADERC) -f $< -o $@ --platform linux --type fragment --verbose -i bgfx/src
+# ------------------------------------------------------------------------------
 
 ${BIN_FOLDER}/%.o:$(SRC_FOLDER)/%.cpp $(INCLUDE_FOLDER)/%.h
 	${binmake}
@@ -53,6 +75,8 @@ ${BIN_FOLDER}/main: main.cpp $(OBJS)
 	@echo $@
 	@$(CXX) $(CXXFLAGS) -o $@ $^ $(RENDER_FLAGS)
 
+shaders: $(SOBJS)
+
 clean:
 	@rm -r bin 
 	$(shell if [[ -x main ]]; then rm main; fi)
@@ -61,6 +85,8 @@ newclass:
 	@touch $(INCLUDE_FOLDER)/$(N).h
 	$(shell echo -n "#include \"$(N).h\" " > $(SRC_FOLDER)/$(N).cpp)
 	@echo "Created"
+
+
 
 run: all
 	@echo "---------------------- RUNING -----------------------"
