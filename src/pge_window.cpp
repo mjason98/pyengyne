@@ -121,7 +121,8 @@ namespace pge
         if (width != oldWidth || height != oldHeight)
         {
             bgfx::reset((uint32_t)width, (uint32_t)height, BGFX_RESET_VSYNC);
-            bgfx::setViewRect(kClearView, 0, 0, bgfx::BackbufferRatio::Equal);
+            // bgfx::setViewRect(kClearView, 0, 0, bgfx::BackbufferRatio::Equal);
+            bgfx::setViewRect(0, 0, 0, width, height);
         }
         // This dummy draw call is here to make sure that view 0 is cleared if no other draw calls are submitted to view 0.
         // bgfx::touch(kClearView);
@@ -134,14 +135,14 @@ namespace pge
         // bgfx::frame();
 
         const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
-        const bx::Vec3 eye = {0.0f, 0.0f, 10.0f};
+        const bx::Vec3 eye = {0.0f, 0.0f, 2.0f}; // todo put z to 1.0
 
         // Set view and projection matrix for view 0.
         float view[16];
         bx::mtxLookAt(view, eye, at);
 
         float proj[16];
-        bx::mtxProj(proj, 60.0f, float(width) / float(height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
+        bx::mtxProj(proj, 45.0f, float(width) / float(height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 
         bgfx::setViewTransform(0, view, proj);
 

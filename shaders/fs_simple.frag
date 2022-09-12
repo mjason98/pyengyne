@@ -8,5 +8,5 @@ void main()
 {
     vec3 sampleC = texture2D(s_texColor, v_texcoord0).xyz;
     gl_FragColor = v_color0;
-    gl_FragColor.xyz *= sampleC;
+    gl_FragColor.xyz = sampleC;
 }

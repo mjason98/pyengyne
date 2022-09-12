@@ -48,8 +48,6 @@ namespace pge {
         handle = bgfx::createTexture(mem, 0UL, 0U, &info);
         bgfx::setName(handle, _name);
 
-        std::cout << "\ttexture resolution " << info.width << 'x' << info.height << '\n';
-
         return handle;
     }
 }

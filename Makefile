@@ -15,6 +15,7 @@ binmake := $(shell if ! [[ -d ${BIN_FOLDER} ]]; then mkdir ${BIN_FOLDER}; fi)
 binmake_s := $(shell if ! [[ -d ${BIN_SHADER_FOLDER} ]]; then mkdir ${BIN_SHADER_FOLDER}; fi)
 
 SHADERC=bgfx/.build/linux64_gcc/bin/shadercRelease
+TEXTUREC=bgfx/.build/linux64_gcc/bin/texturecRelease
 
 # LIBRARIES : ------------------------------------------------------------------
 INCLUDE_FLAGS+= -Iglfw/include
@@ -86,7 +87,9 @@ newclass:
 	$(shell echo -n "#include \"$(N).h\" " > $(SRC_FOLDER)/$(N).cpp)
 	@echo "Created"
 
-
+newTexture:
+	$(TEXTUREC) -f $(IN) -o data/textures/$(addsuffix .dds, $(basename $(notdir $(IN)))) -q highest
+	@echo "Created"
 
 run: all
 	@echo "---------------------- RUNING -----------------------"
