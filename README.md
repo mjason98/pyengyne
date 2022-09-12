@@ -32,6 +32,10 @@ In the root repository folder:
 ```shell
 make 
 ```
+then, build the shaders:
+```shell
+make shaders
+```
 
 ### Run the engyne
 In the root repository folder:
