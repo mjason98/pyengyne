@@ -1,7 +1,5 @@
 #include "pge_window.h"
-
-#include <stdexcept>
-#include <fstream>
+#include "pge_data.h"
 
 namespace pge
 {
@@ -12,6 +10,8 @@ namespace pge
 
     PgeWindow::~PgeWindow()
     {
+        // todo destroy programs, modles, textures
+        
         bgfx::shutdown();
         glfwDestroyWindow(window);
         glfwTerminate();
@@ -33,27 +33,6 @@ namespace pge
         if (key == GLFW_KEY_F1 && action == GLFW_RELEASE)
             s_showStats = !s_showStats;
 #endif
-    }
-
-    bgfx::ShaderHandle loadShader(const char *_name)
-    {
-        char *data = new char[2048]; // see charsize
-        std::ifstream file;
-        size_t fileSize;
-        file.open(_name);
-        if (file.is_open())
-        {
-            file.seekg(0, std::ios::end);
-            fileSize = file.tellg();
-            file.seekg(0, std::ios::beg);
-            file.read(data, fileSize);
-            file.close();
-        }
-        const bgfx::Memory *mem = bgfx::copy(data, fileSize + 1);
-        mem->data[mem->size - 1] = '\0';
-        bgfx::ShaderHandle handle = bgfx::createShader(mem);
-        bgfx::setName(handle, _name);
-        return handle;
     }
 
     bgfx::VertexLayout PosColorVertex::ms_layout;
@@ -118,10 +97,12 @@ namespace pge
             bgfx::makeRef(s_cubeTriList, sizeof(s_cubeTriList)));
 
 
-        vsh = loadShader("bin/shaders/vs_simple.bin");
-        fsh = loadShader("bin/shaders/fs_simple.bin");
+        vsh = loadShader(SHADER_SIMPLE_VS);
+        fsh = loadShader(SHADER_SIMPLE_FS);
 
         m_program = bgfx::createProgram(vsh, fsh, true);
+
+        texture1 = loadTexture(TEXTURE_TEST);
     }
 
     // ------------------------------------------------------------------
