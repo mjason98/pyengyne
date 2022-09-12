@@ -16,6 +16,8 @@ namespace pge
         float m_z;
         // Color value
         uint32_t m_abgr;
+        float m_u;
+	    float m_v;
 
         static void init()
         {
@@ -26,6 +28,7 @@ namespace pge
                 .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
                 // and a uint8 color value that denotes color
                 .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
+                .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
                 .end();
         };
 
@@ -37,10 +40,10 @@ namespace pge
 
     static PosColorVertex s_cubeVertices[] =
 {
-    {  0.5f,  0.5f, 0.0f, 0xff0000ff },
-    {  0.5f, -0.5f, 0.0f, 0xff0000ff },
-    { -0.5f, -0.5f, 0.0f, 0xff00ff00 },
-    { -0.5f,  0.5f, 0.0f, 0xff00ff00 }
+    {  1.0f,  1.0f, 0.0f, 0xf00000ff, 1.0f, 1.0f },
+    {  1.0f, -1.0f, 0.0f, 0xff0000ff, 1.0f, 0.0f },
+    { -1.0f, -1.0f, 0.0f, 0xff00ff00, 0.0f, 0.0f },
+    { -1.0f,  1.0f, 0.0f, 0xff00ff00, 0.0f, 1.0f }
 };
 
 static const uint16_t s_cubeTriList[] =
@@ -79,5 +82,6 @@ static const uint16_t s_cubeTriList[] =
         bgfx::ProgramHandle m_program;
 
         bgfx::TextureHandle texture1;
+        bgfx::UniformHandle m_textureColor;
     };
 }

@@ -11,7 +11,9 @@ namespace pge
     PgeWindow::~PgeWindow()
     {
         // todo destroy programs, modles, textures
-        
+        bgfx::destroy(m_program);
+		bgfx::destroy(m_textureColor);
+
         bgfx::shutdown();
         glfwDestroyWindow(window);
         glfwTerminate();
@@ -103,6 +105,8 @@ namespace pge
         m_program = bgfx::createProgram(vsh, fsh, true);
 
         texture1 = loadTexture(TEXTURE_TEST);
+        
+        m_textureColor  = bgfx::createUniform("s_texColor",  bgfx::UniformType::Sampler);
     }
 
     // ------------------------------------------------------------------
@@ -163,6 +167,8 @@ namespace pge
 
         // Set render states.
         bgfx::setState(BGFX_STATE_DEFAULT);
+
+        bgfx::setTexture(0, m_textureColor, texture1);
 
         // Submit primitive for rendering to view 0.
         bgfx::submit(0, m_program);
