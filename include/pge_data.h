@@ -7,6 +7,16 @@ namespace pge {
     #define SHADER_SIMPLE_FS "bin/shaders/fs_simple.bin"
     /// textures
     #define TEXTURE_TEST "bin/data/mushroom.dds"
+
+    struct game_object_info
+    {
+        // position
+        float x, y, z;
+        // scale
+        float sx, xy, sz;
+        // rotation
+        // todo
+    };
 }
 
 #endif

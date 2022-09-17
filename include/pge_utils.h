@@ -33,6 +33,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <unordered_map>
+#include <vector>
+#include "pge_data.h"
 
 #endif // used in tools
 
@@ -76,6 +78,38 @@ namespace pge
         };
         static bgfx::VertexLayout ms_layout;
 #endif // used in tools
+    };
+
+    class mesh
+    {
+    private:
+        _pge_vertex_data *vertices;
+        uint32_t *indices;
+#ifndef PGE_NO_BGFX
+        // bgfx::TextureHandle m_diffuse, m_normal;
+        bgfx::VertexBufferHandle m_vbh;
+        bgfx::IndexBufferHandle m_ibh;
+
+    public:
+        void initBuffers();
+        void subdmit(bgfx::ProgramHandle &m_program);
+#endif
+    public:
+        ~mesh();
+        void load(std::ifstream &IN);
+        void save(std::ofstream &OUT);
+    };
+
+    class model
+    {
+        private:
+        std::vector<mesh> meshes;
+        
+        // model matriz
+        float mtx[16];
+        game_object_info goi;
+
+        void subdmit(bgfx::ProgramHandle &m_program);
     };
 
 }

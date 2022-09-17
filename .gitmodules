@@ -14,3 +14,7 @@
 	path = glfw
 	url = https://github.com/glfw/glfw.git
 	branch = master
+[submodule "assimp"]
+	path = assimp
+	url = https://github.com/assimp/assimp.git
+	branch = master

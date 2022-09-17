@@ -42,11 +42,11 @@ namespace pge
         return handle;
     }
 
-    #ifndef PGE_TEXTURE_STORE_HEADER
-    #define PGE_TEXTURE_STORE_HEADER
+#ifndef PGE_TEXTURE_STORE_HEADER
+#define PGE_TEXTURE_STORE_HEADER
     // texture storage
     std::unordered_map<std::string, _pge_texture_pt> PGE_TEXTURE_STORE;
-    #endif
+#endif
 
     bgfx::TextureHandle loadTexture(const char *_name)
     {
@@ -87,5 +87,70 @@ namespace pge
         }
         else
             std::cout << "WARNING failed attempt to erase an unexisting texture: " << _name << '\n';
+    }
+
+#ifndef PGE_NO_BGFX
+    void mesh::initBuffers()
+    {
+        m_vbh = bgfx::createVertexBuffer(bgfx::makeRef(vertices, sizeof(vertices)), _pge_vertex_data::ms_layout);
+        m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(indices, sizeof(indices)));
+    }
+
+    mesh::~mesh()
+    {
+        bgfx::destroy(m_vbh);
+        bgfx::destroy(m_ibh);
+
+        delete vertices;
+        delete indices;
+    }
+#else
+    mesh::~mesh()
+    {
+        delete vertices;
+        delete indices;
+    }
+#endif
+
+    void mesh::load(std::ifstream &IN)
+    {
+        uint32_t size;
+        // number of verticies
+        IN >> size;
+        vertices = new _pge_vertex_data[size];
+        IN.read((char *)vertices, sizeof(vertices));
+
+        //number of indices
+        IN >> size;
+        indices = new uint32_t[size];
+        IN.read((char *)indices, sizeof(indices));
+    }
+
+    void mesh::save(std::ofstream &OUT)
+    {
+        uint32_t num_vertices = sizeof(vertices) / sizeof(_pge_vertex_data);
+        OUT << num_vertices;
+        OUT.write((char*)vertices, sizeof(vertices));
+
+        uint32_t num_indices = sizeof(indices) / sizeof(uint32_t);
+        OUT << num_indices;
+        OUT.write((char*)num_indices, sizeof(num_indices));
+    }
+
+    void mesh::subdmit(bgfx::ProgramHandle &m_program)
+    {
+        bgfx::setVertexBuffer(0, m_vbh);
+        bgfx::setIndexBuffer(m_ibh);
+        bgfx::submit(0, m_program);
+    }
+
+    void model::subdmit(bgfx::ProgramHandle &m_program)
+    {
+        // Set model matrix for rendering.
+        bgfx::setTransform(mtx);
+
+        // subdmit all meshes
+        for (auto &mh: meshes)
+            mh.subdmit(m_program);
     }
 }
