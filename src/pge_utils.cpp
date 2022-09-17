@@ -122,7 +122,7 @@ namespace pge
         vertices = new _pge_vertex_data[size];
         IN.read(reinterpret_cast<char *>(vertices), sizeof(vertices));
 
-        //number of indices
+        // number of indices
         IN >> size;
         indices = new uint32_t[size];
         IN.read(reinterpret_cast<char *>(indices), sizeof(indices));
@@ -146,13 +146,15 @@ namespace pge
         bgfx::submit(0, m_program);
     }
 
+#ifndef PGE_NO_BGFX
     void model::subdmit(bgfx::ProgramHandle &m_program)
     {
         // Set model matrix for rendering.
         bgfx::setTransform(mtx);
 
         // subdmit all meshes
-        for (auto &mh: meshes)
+        for (auto &mh : meshes)
             mh.subdmit(m_program);
     }
+#endif
 }

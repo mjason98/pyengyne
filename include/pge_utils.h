@@ -33,10 +33,11 @@
 #include <iostream>
 #include <stdexcept>
 #include <unordered_map>
-#include <vector>
-#include "pge_data.h"
 
 #endif // used in tools
+
+#include <vector>
+#include "pge_data.h"
 
 namespace pge
 {
@@ -109,7 +110,9 @@ namespace pge
         float mtx[16];
         game_object_info goi;
 
+#ifndef PGE_NO_BGFX
         void subdmit(bgfx::ProgramHandle &m_program);
+#endif
     };
 
 }

@@ -120,7 +120,8 @@ textures: $(TOBJS)
 tools: $(ToOBJS)
 
 clean:
-	@rm -r bin 
+	@rm -r $(BIN_FOLDER)
+	@rm -r $(BIN_TOOLS_FOLDER)
 	$(shell if [[ -x main ]]; then rm main; fi)
 
 newclass:
