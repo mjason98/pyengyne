@@ -10,9 +10,11 @@ namespace pge
 
     PgeWindow::~PgeWindow()
     {
+        unloadTexture(TEXTURE_TEST);
+
         // todo destroy programs, modles, textures
         bgfx::destroy(m_program);
-		bgfx::destroy(m_textureColor);
+		// bgfx::destroy(m_textureColor);
 
         bgfx::shutdown();
         glfwDestroyWindow(window);

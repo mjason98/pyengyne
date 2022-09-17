@@ -30,10 +30,20 @@
 #include <string>
 #include <iostream>
 #include <stdexcept>
+#include <unordered_map>
 
 namespace pge {
+
+    // Store texture type
+    struct _pge_texture_pt
+    {
+        bgfx::TextureHandle handle; // bgfx handle for textures
+        uint32_t pointers; // how many object load the texture, if equals 0, the texture is removed
+    };
+
     bgfx::ShaderHandle loadShader(const char *_name);
     bgfx::TextureHandle loadTexture(const char *_name);
+    void unloadTexture(const char *_name);
 }
 
 #endif

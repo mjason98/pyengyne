@@ -112,8 +112,6 @@ newclass:
 
 run: all
 	@echo "---------------------- RUNING -----------------------"
-	cd ${BIN_FOLDER} 
-	ls
-	./main 
+	@${BIN_FOLDER}/main 
 	@echo "------------------- END OF RUNING -------------------"
 	
