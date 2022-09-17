@@ -97,7 +97,7 @@ ${BIN_TEXTURE_FOLDER}/%.dds:$(TEXTURE_FOLDER)/%.png
 ${BIN_TOOLS_FOLDER}/%:$(TOOLS_FOLDER)/%.cpp $(INCLUDE_FOLDER)/pge_utils.h
 	${binmake_tool}
 	@echo $@
-	@$(CXX) $(CXXFLAGS) -o $@ $^ $(TOOLS_FLAGS) -I$(INCLUDE_FOLDER)/pge_utils.h
+	@$(CXX) $(CXXFLAGS) -o $@ $^ $(TOOLS_FLAGS) -I$(INCLUDE_FOLDER)
 # ------------------------------------------------------------------------------
 
 ${BIN_FOLDER}/%.o:$(SRC_FOLDER)/%.cpp $(INCLUDE_FOLDER)/%.h

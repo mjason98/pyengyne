@@ -21,7 +21,7 @@ namespace pge
             mem = bgfx::alloc(fileSize + 1);
 
             file.seekg(0, std::ios::beg);
-            file.read((char *)mem->data, fileSize);
+            file.read(reinterpret_cast<char *>(mem->data), fileSize);
             file.close();
 
             std::cout << "Readed: " << _name << " size: " << fileSize << '\n';
@@ -90,6 +90,8 @@ namespace pge
     }
 
 #ifndef PGE_NO_BGFX
+    bgfx::VertexLayout _pge_vertex_data::ms_layout;
+
     void mesh::initBuffers()
     {
         m_vbh = bgfx::createVertexBuffer(bgfx::makeRef(vertices, sizeof(vertices)), _pge_vertex_data::ms_layout);
@@ -118,23 +120,23 @@ namespace pge
         // number of verticies
         IN >> size;
         vertices = new _pge_vertex_data[size];
-        IN.read((char *)vertices, sizeof(vertices));
+        IN.read(reinterpret_cast<char *>(vertices), sizeof(vertices));
 
         //number of indices
         IN >> size;
         indices = new uint32_t[size];
-        IN.read((char *)indices, sizeof(indices));
+        IN.read(reinterpret_cast<char *>(indices), sizeof(indices));
     }
 
     void mesh::save(std::ofstream &OUT)
     {
         uint32_t num_vertices = sizeof(vertices) / sizeof(_pge_vertex_data);
         OUT << num_vertices;
-        OUT.write((char*)vertices, sizeof(vertices));
+        OUT.write(reinterpret_cast<const char *>(vertices), sizeof(vertices));
 
         uint32_t num_indices = sizeof(indices) / sizeof(uint32_t);
         OUT << num_indices;
-        OUT.write((char*)num_indices, sizeof(num_indices));
+        OUT.write(reinterpret_cast<const char *>(num_indices), sizeof(num_indices));
     }
 
     void mesh::subdmit(bgfx::ProgramHandle &m_program)
