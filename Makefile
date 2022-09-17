@@ -5,6 +5,8 @@ SRC_FOLDER=src
 INCLUDE_FOLDER=include
 SHADERS_FOLDER=shaders
 BIN_SHADER_FOLDER=${BIN_FOLDER}/${SHADERS_FOLDER}
+TEXTURE_FOLDER=data/textures
+BIN_TEXTURE_FOLDER=${BIN_FOLDER}/data
 
 # -----------------------------------  LIBRARIES -----------------------------------
 
@@ -13,6 +15,7 @@ RENDER_FLAGS=-ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi -lGL -lvulkan
 
 binmake := $(shell if ! [[ -d ${BIN_FOLDER} ]]; then mkdir ${BIN_FOLDER}; fi)
 binmake_s := $(shell if ! [[ -d ${BIN_SHADER_FOLDER} ]]; then mkdir ${BIN_SHADER_FOLDER}; fi)
+binmake_t := $(shell if ! [[ -d ${BIN_TEXTURE_FOLDER} ]]; then mkdir ${BIN_TEXTURE_FOLDER}; fi)
 
 SHADERC=bgfx/.build/linux64_gcc/bin/shadercRelease
 TEXTUREC=bgfx/.build/linux64_gcc/bin/texturecRelease
@@ -38,6 +41,10 @@ SSOURCES= $(wildcard $(SHADERS_FOLDER)/*.vert)
 SSOURCES+=$(wildcard $(SHADERS_FOLDER)/*.frag)
 SOBJS = $(addprefix  $(BIN_SHADER_FOLDER)/,$(addsuffix .bin, $(basename $(notdir $(SSOURCES)))))
 # -----------------------------------------------------------------------------------
+TSOURCES= $(wildcard $(TEXTURE_FOLDER)/*.jpg)
+TSOURCES+=$(wildcard $(TEXTURE_FOLDER)/*.png)
+TOBJS = $(addprefix  $(BIN_TEXTURE_FOLDER)/,$(addsuffix .dds, $(basename $(notdir $(TSOURCES)))))
+# -----------------------------------------------------------------------------------
 
 .PHONY: all debug clean run newclass
 
@@ -45,6 +52,8 @@ all: debug
 
 debug: CXXFLAGS+=-g3 -ggdb
 debug: CXXFLAGS+=-DDEBUG
+debug: shaders
+debug: textures
 debug: ${BIN_FOLDER}/main
 
 # shader compilation ********************************************************
@@ -59,6 +68,19 @@ ${BIN_SHADER_FOLDER}/%.bin:$(SHADERS_FOLDER)/%.frag
 	${binmake_s}
 	@echo $@
 	@$(SHADERC) -f $< -o $@ --platform linux --type fragment --verbose -i bgfx/src
+# ------------------------------------------------------------------------------
+
+# texture compilation ********************************************************
+${BIN_TEXTURE_FOLDER}/%.dds:$(TEXTURE_FOLDER)/%.jpg
+	${binmake}
+	${binmake_t}
+	@echo $@
+	@$(TEXTUREC) -f $< -o $@ -q highest
+${BIN_TEXTURE_FOLDER}/%.dds:$(TEXTURE_FOLDER)/%.png
+	${binmake}
+	${binmake_t}
+	@echo $@
+	@$(TEXTUREC) -f $< -o $@ -q highest
 # ------------------------------------------------------------------------------
 
 ${BIN_FOLDER}/%.o:$(SRC_FOLDER)/%.cpp $(INCLUDE_FOLDER)/%.h
@@ -77,6 +99,7 @@ ${BIN_FOLDER}/main: main.cpp $(OBJS)
 	@$(CXX) $(CXXFLAGS) -o $@ $^ $(RENDER_FLAGS)
 
 shaders: $(SOBJS)
+textures: $(TOBJS)
 
 clean:
 	@rm -r bin 
@@ -87,12 +110,10 @@ newclass:
 	$(shell echo -n "#include \"$(N).h\" " > $(SRC_FOLDER)/$(N).cpp)
 	@echo "Created"
 
-newTexture:
-	$(TEXTUREC) -f $(IN) -o data/textures/$(addsuffix .dds, $(basename $(notdir $(IN)))) -q highest
-	@echo "Created"
-
 run: all
 	@echo "---------------------- RUNING -----------------------"
-	@${BIN_FOLDER}/main 
+	cd ${BIN_FOLDER} 
+	ls
+	./main 
 	@echo "------------------- END OF RUNING -------------------"
 	
