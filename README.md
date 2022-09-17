@@ -22,6 +22,13 @@ cmake . -B build
 cd build
 make 
 ```
+### Build assimp (for model loading)
+See assimp documentation [here](https://github.com/assimp/assimp/blob/master/Build.md). In the root repository folder:
+```
+cd assimp
+cmake CMakeList.txt
+make -j4
+```
 ### Build reactphisics3d
 In the root repository folder:
 ```
