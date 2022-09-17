@@ -7,15 +7,20 @@ SHADERS_FOLDER=shaders
 BIN_SHADER_FOLDER=${BIN_FOLDER}/${SHADERS_FOLDER}
 TEXTURE_FOLDER=data/textures
 BIN_TEXTURE_FOLDER=${BIN_FOLDER}/data
+TOOLS_FOLDER=tools
+BIN_TOOLS_FOLDER=${TOOLS_FOLDER}/bin
+
 
 # -----------------------------------  LIBRARIES -----------------------------------
 
 INCLUDE_FLAGS=-I$(INCLUDE_FOLDER)
 RENDER_FLAGS=-ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi -lGL -lvulkan
+TOOLS_FLAGS=-ldl -lpthread -lassimp
 
 binmake := $(shell if ! [[ -d ${BIN_FOLDER} ]]; then mkdir ${BIN_FOLDER}; fi)
 binmake_s := $(shell if ! [[ -d ${BIN_SHADER_FOLDER} ]]; then mkdir ${BIN_SHADER_FOLDER}; fi)
 binmake_t := $(shell if ! [[ -d ${BIN_TEXTURE_FOLDER} ]]; then mkdir ${BIN_TEXTURE_FOLDER}; fi)
+binmake_tool := $(shell if ! [[ -d ${BIN_TOOLS_FOLDER} ]]; then mkdir ${BIN_TOOLS_FOLDER}; fi)
 
 SHADERC=bgfx/.build/linux64_gcc/bin/shadercRelease
 TEXTUREC=bgfx/.build/linux64_gcc/bin/texturecRelease
@@ -45,6 +50,9 @@ TSOURCES= $(wildcard $(TEXTURE_FOLDER)/*.jpg)
 TSOURCES+=$(wildcard $(TEXTURE_FOLDER)/*.png)
 TOBJS = $(addprefix  $(BIN_TEXTURE_FOLDER)/,$(addsuffix .dds, $(basename $(notdir $(TSOURCES)))))
 # -----------------------------------------------------------------------------------
+ToSOURCES= $(wildcard $(TOOLS_FOLDER)/*.cpp)
+ToOBJS = $(addprefix  $(BIN_TOOLS_FOLDER)/,$(basename $(notdir $(ToSOURCES))))
+# -----------------------------------------------------------------------------------
 
 .PHONY: all debug clean run newclass
 
@@ -54,6 +62,8 @@ debug: CXXFLAGS+=-g3 -ggdb
 debug: CXXFLAGS+=-DDEBUG
 debug: shaders
 debug: textures
+#change this with models
+debug: tools
 debug: ${BIN_FOLDER}/main
 
 # shader compilation ********************************************************
@@ -83,6 +93,13 @@ ${BIN_TEXTURE_FOLDER}/%.dds:$(TEXTURE_FOLDER)/%.png
 	@$(TEXTUREC) -f $< -o $@ -q highest
 # ------------------------------------------------------------------------------
 
+# tools compilation ********************************************************
+${BIN_TOOLS_FOLDER}/%:$(TOOLS_FOLDER)/%.cpp $(INCLUDE_FOLDER)/pge_utils.h
+	${binmake_tool}
+	@echo $@
+	@$(CXX) $(CXXFLAGS) -o $@ $^ $(TOOLS_FLAGS) -I$(INCLUDE_FOLDER)/pge_utils.h
+# ------------------------------------------------------------------------------
+
 ${BIN_FOLDER}/%.o:$(SRC_FOLDER)/%.cpp $(INCLUDE_FOLDER)/%.h
 	${binmake}
 	@echo $@
@@ -100,6 +117,7 @@ ${BIN_FOLDER}/main: main.cpp $(OBJS)
 
 shaders: $(SOBJS)
 textures: $(TOBJS)
+tools: $(ToOBJS)
 
 clean:
 	@rm -r bin 

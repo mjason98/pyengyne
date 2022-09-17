@@ -4,3 +4,4 @@ bimg/*
 .vscode
 bin
 glfw/*
+tools/bin

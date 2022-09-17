@@ -9,6 +9,8 @@
 
 #define BGFX_CONFIG_RENDERER_OPENGL 44
 
+#ifndef PGE_NO_BGFX // used in tools
+
 #include <bx/bx.h>
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
@@ -32,18 +34,50 @@
 #include <stdexcept>
 #include <unordered_map>
 
-namespace pge {
+#endif // used in tools
 
+namespace pge
+{
+#ifndef PGE_NO_BGFX // used in tools
     // Store texture type
     struct _pge_texture_pt
     {
         bgfx::TextureHandle handle; // bgfx handle for textures
-        uint32_t pointers; // how many object load the texture, if equals 0, the texture is removed
+        uint32_t pointers;          // how many object load the texture, if equals 0, the texture is removed
     };
 
     bgfx::ShaderHandle loadShader(const char *_name);
     bgfx::TextureHandle loadTexture(const char *_name);
     void unloadTexture(const char *_name);
+#endif // used in tools
+
+    // mesh and models
+    struct _pge_vertex_data
+    {
+        // position
+        float m_x;
+        float m_y;
+        float m_z;
+        // normal
+        uint32_t m_normal;
+        // texture cordinates
+        float m_u;
+        float m_v;
+
+#ifndef PGE_NO_BGFX // used in tools
+        static void init()
+        {
+            ms_layout
+                .begin()
+                .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+                .add(bgfx::Attrib::Normal, 4, bgfx::AttribType::Uint8, true, true)
+                .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+                .end();
+        };
+        static bgfx::VertexLayout ms_layout;
+#endif // used in tools
+    };
+
 }
 
 #endif
